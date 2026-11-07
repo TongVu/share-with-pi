@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Share with Pi",
   "version": "0.2.0",
-  "description": "Collect inspected localhost:8080 elements into a journey and share it with Pi as a local JSON file.",
+  "description": "Collect inspected elements from configured origins into a journey and share it with Pi as a local JSON file.",
   "devtools_page": "devtools.html",
   "icons": {
     "16": "icons/icon-16.png",

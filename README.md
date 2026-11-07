@@ -15,7 +15,7 @@ cd share-with-pi
 ```
 
 Use a **dedicated development Chrome profile**, not your personal browsing profile.
-Capture is restricted to `http://localhost:8080`.
+Capture defaults to `http://localhost:8080`; allowed origins are configured in `config.js`.
 
 1. In the dedicated development Chrome window, open `chrome://extensions` manually.
 2. Enable **Developer mode**.
@@ -40,6 +40,29 @@ In Pi, MCP configuration changes require `/reload`; extension source changes do 
 
 A localhost-restricted browser connection cannot open `chrome://extensions`, so
 installation/reloading is a manual step. Do not widen the allowlist to automate it.
+
+## Configure host and port
+
+Edit `config.js`, the single origin list used by capture, exported-step validation,
+and the sidebar's allowed-origins notice:
+
+```js
+export const allowedOrigins = [
+  "http://localhost:8080",
+];
+```
+
+Each entry is an exact origin: protocol + hostname + optional port, with no path,
+trailing slash, or wildcard. Use the browser-normalized origin (for example,
+`new URL(appUrl).origin`). Other ports, hostnames, and protocols remain blocked unless
+explicitly listed. An empty list disables capture and export. Save unsaved work, reload
+the extension in `chrome://extensions`, then close and reopen DevTools to apply edits.
+
+**This is separate from Pi's browser access.** Pi's Chrome MCP URL allowlist lives in
+`~/.pi/agent/mcp.json`, outside this repository. Editing `config.js` does not modify or
+expand that allowlist, and adding an extension origin does not authorize Pi to control
+it. MCP scope changes require explicit approval and an MCP/browser restart. Keep the
+current MCP restrictions unchanged unless that separate change is approved.
 
 ## Record a journey
 
@@ -95,14 +118,15 @@ inspection sequence, not proof that the described actions were executed.
 
 ## Scope and privacy
 
-- Capture is hard-coded to `http://localhost:8080`; other ports, HTTPS, and `127.0.0.1` are refused.
+- Capture and export use `allowedOrigins` from `config.js`. The default is only
+  `http://localhost:8080`; other ports, HTTPS, and `127.0.0.1` are refused unless listed.
 - Only the `downloads` permission is requested. There are no host permissions,
   content scripts, background server, analytics, or automatic uploads.
 - Form values, editable contents, event handlers, `data-*` attributes, and common
   secret-named attributes are omitted. Scripts, styles, and embedded documents are omitted.
 - This is **not a full sensitive-data scrubber**. URLs (including queries), visible
   text, IDs, and other attributes may contain private information. With recording enabled,
-  all inspected targets on the allowed origin can enter the list. Pause during unrelated
+  all inspected targets on the allowed origins can enter the list. Pause during unrelated
   debugging and remove accidental steps before saving. Review your own notes too.
 - Individual snapshots are bounded and may be truncated. HTML previews do not expand
   shadow trees; shadow selections include a host-selector path. Cross-frame selection
@@ -123,8 +147,10 @@ On 2026-11-07, version 0.1.0 was manually installed by the user and real downloa
 single-element files were read by Pi, including a three-file Open → Absences →
 Substitutes sequence. The missing-avatar report exposed the need for automatic collection.
 
-The current source passes 16 local tests using jsdom and mocked Chrome APIs. These cover
-capture/redaction/origin restrictions, icons, ordered journey export, per-step notes,
+The current source passes 21 local tests using jsdom and mocked Chrome APIs. These cover
+capture/redaction/origin restrictions, shared origin configuration (including serialized
+DevTools evaluation, export, the sidebar notice, and an empty allowlist), icons,
+ordered journey export, per-step notes,
 collection while the panel is hidden, duplicate/revisited elements, pause/resume,
 remove/clear, delayed callbacks, and download failures. `npm audit` reported zero
 vulnerabilities. These tests alone do **not** establish live Chrome acceptance.

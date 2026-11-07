@@ -1,11 +1,13 @@
+import { allowedOrigins } from "./config.js";
+
 // Keep this function self-contained: DevTools evaluates its source in the page.
-export function captureSelection(element) {
+function captureElement(element, origins) {
   if (!element || element.nodeType !== 1) {
     throw new Error("Select an element in the DevTools Elements tab first.");
   }
   const doc = element.ownerDocument;
-  if (doc.location.origin !== "http://localhost:8080") {
-    throw new Error("Share with Pi only captures http://localhost:8080 pages.");
+  if (!origins.includes(doc.location.origin)) {
+    throw new Error(`Share with Pi only captures configured origins: ${origins.join(", ") || "(none)"}.`);
   }
 
   const escape = (value) => doc.defaultView.CSS?.escape
@@ -96,6 +98,10 @@ export function captureSelection(element) {
   };
 }
 
+export function captureSelection(element) {
+  return captureElement(element, allowedOrigins);
+}
+
 export function selectionExpression() {
-  return `(${captureSelection.toString()})(typeof $0 === 'undefined' ? null : $0)`;
+  return `(${captureElement.toString()})(typeof $0 === 'undefined' ? null : $0, ${JSON.stringify(allowedOrigins)})`;
 }

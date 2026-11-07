@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { JSDOM } from "jsdom";
 import { captureSelection, selectionExpression } from "../capture.js";
+import { allowedOrigins } from "../config.js";
 
 function page(html, url = "http://localhost:8080/example") {
   return new JSDOM(html, { url, runScripts: "outside-only" });
@@ -35,6 +36,36 @@ test("refuses other ports, aliases, protocols, and external pages", () => {
     assert.throws(() => captureSelection(dom.window.document.querySelector("button")), /only captures/);
     dom.window.close();
   }
+});
+
+test("uses config for direct capture and serialized DevTools evaluation on an alternate origin", (t) => {
+  const original = [...allowedOrigins];
+  t.after(() => allowedOrigins.splice(0, allowedOrigins.length, ...original));
+  const alternatives = ["http://localhost:3030", "https://app.example.test:9443"];
+  allowedOrigins.push(...alternatives);
+  for (const origin of alternatives) {
+    const dom = page('<button id="open">Open</button>', `${origin}/example`);
+    t.after(() => dom.window.close());
+    dom.window.$0 = dom.window.document.querySelector("button");
+    assert.equal(captureSelection(dom.window.$0).page.url, `${origin}/example`);
+    assert.equal(dom.window.eval(selectionExpression()).page.url, `${origin}/example`);
+  }
+  const denied = page("<button>Open</button>", "http://localhost:3031");
+  t.after(() => denied.window.close());
+  denied.window.$0 = denied.window.document.querySelector("button");
+  assert.throws(() => captureSelection(denied.window.$0), /configured origins/);
+  assert.throws(() => denied.window.eval(selectionExpression()), /configured origins/);
+});
+
+test("an empty configured origin list denies direct and serialized capture", (t) => {
+  const original = [...allowedOrigins];
+  t.after(() => allowedOrigins.splice(0, allowedOrigins.length, ...original));
+  allowedOrigins.length = 0;
+  const dom = page("<button>Open</button>");
+  t.after(() => dom.window.close());
+  dom.window.$0 = dom.window.document.querySelector("button");
+  assert.throws(() => captureSelection(dom.window.$0), /configured origins: \(none\)/);
+  assert.throws(() => dom.window.eval(selectionExpression()), /configured origins: \(none\)/);
 });
 
 test("omits form values, editable text, script contents, and common secret attributes", () => {

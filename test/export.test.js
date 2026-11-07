@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createJourneyShare, shareFilename } from "../export.js";
+import { allowedOrigins } from "../config.js";
 
 const snapshot = { page: { url: "http://localhost:8080/example" }, element: { html: "<button>Open</button>" } };
 const steps = [{ snapshot, note: " Open the menu " }, { snapshot, note: " Choose Absences " }];
@@ -17,6 +18,25 @@ test("exports a versioned, ordered journey with optional question and per-step n
   assert.ok(Number.isFinite(Date.parse(roundTrip.savedAt)));
   assert.match(shareFilename(share, "abcd1234"), /^share-with-pi\/share-[\dT-Z-]+-abcd1234\.json$/);
   assert.equal(createJourneyShare([{ snapshot, note: "" }]).question, "");
+});
+
+test("export uses configured origins for multi-origin journeys and still rejects unlisted origins", (t) => {
+  const original = [...allowedOrigins];
+  t.after(() => allowedOrigins.splice(0, allowedOrigins.length, ...original));
+  allowedOrigins.push("http://localhost:3030");
+  const alternate = { ...snapshot, page: { url: "http://localhost:3030/example" } };
+  const share = createJourneyShare([...steps, { snapshot: alternate, note: "Next app" }]);
+  assert.equal(share.steps.at(-1).snapshot.page.url, alternate.page.url);
+  assert.throws(() => createJourneyShare([{
+    snapshot: { ...snapshot, page: { url: "http://localhost:3031/example" } }, note: "",
+  }]), /configured origins/);
+});
+
+test("an empty configured origin list denies export", (t) => {
+  const original = [...allowedOrigins];
+  t.after(() => allowedOrigins.splice(0, allowedOrigins.length, ...original));
+  allowedOrigins.length = 0;
+  assert.throws(() => createJourneyShare(steps), /configured origins: \(none\)/);
 });
 
 test("rejects empty journeys, invalid origins, and excessive questions or notes", () => {

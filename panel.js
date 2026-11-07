@@ -1,3 +1,4 @@
+import { allowedOrigins } from "./config.js";
 import { selectionExpression } from "./capture.js";
 import { createJourneyShare, shareFilename } from "./export.js";
 
@@ -12,6 +13,7 @@ const clearButton = document.querySelector("#clear");
 const removeButton = document.querySelector("#remove");
 const refreshButton = document.querySelector("#refresh");
 const saveButton = document.querySelector("#save");
+document.querySelector("#allowed-origins").textContent = allowedOrigins.join(", ") || "(none)";
 let steps = [];
 let selectedId = null;
 let recording = true;

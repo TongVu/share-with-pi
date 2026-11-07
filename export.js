@@ -1,3 +1,5 @@
+import { allowedOrigins } from "./config.js";
+
 export function createJourneyShare(steps, question = "") {
   if (!steps.length) throw new Error("Inspect at least one element before saving.");
   const text = (value) => {
@@ -12,8 +14,8 @@ export function createJourneyShare(steps, question = "") {
     savedAt: new Date().toISOString(),
     question: text(question),
     steps: steps.map(({ snapshot, note }, index) => {
-      if (!snapshot || new URL(snapshot.page.url).origin !== "http://localhost:8080") {
-        throw new Error("Every step must capture a localhost:8080 element.");
+      if (!snapshot || !allowedOrigins.includes(new URL(snapshot.page.url).origin)) {
+        throw new Error(`Every step must capture an element from configured origins: ${allowedOrigins.join(", ") || "(none)"}.`);
       }
       return { step: index + 1, note: text(note), snapshot: structuredClone(snapshot) };
     }),

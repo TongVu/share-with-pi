@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "check": "node --check capture.js && node --check export.js && node --check panel.js && node --check devtools.js && npm test"
+    "check": "node --check config.js && node --check capture.js && node --check export.js && node --check panel.js && node --check devtools.js && npm test"
   },
   "devDependencies": {
     "jsdom": "27.2.0"

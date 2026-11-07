@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { JSDOM } from "jsdom";
 import { captureSelection } from "../capture.js";
+import { allowedOrigins } from "../config.js";
 
 const tick = () => new Promise(setImmediate);
 let moduleId = 0;
@@ -90,6 +91,16 @@ test("records avatar → Absences → Substitutes without saving each selection,
   assert.match(h.requested.filename, /^share-with-pi\/share-.*\.json$/);
   assert.equal(h.changes.size, 0);
   assert.equal(h.get("steps").options.length, 3); // Save does not silently discard work.
+});
+
+test("shows the configured origins and passes them into inspected-page evaluation", async (t) => {
+  const original = [...allowedOrigins];
+  t.after(() => allowedOrigins.splice(0, allowedOrigins.length, ...original));
+  allowedOrigins.push("http://localhost:3030");
+  const h = await harness(t);
+  assert.equal(h.get("allowed-origins").textContent, allowedOrigins.join(", "));
+  assert.ok(h.evaluations[0].expression.includes(JSON.stringify(allowedOrigins)));
+  h.reply();
 });
 
 test("deduplicates consecutive inspections/refreshes, preserves notes, and keeps later revisits", async (t) => {
