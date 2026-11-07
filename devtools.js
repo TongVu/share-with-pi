@@ -1,1 +1,3 @@
-chrome.devtools.panels.create("Share with Pi", "icons/icon-32.png", "panel.html");
+chrome.devtools.panels.elements.createSidebarPane("Share with Pi", (sidebar) => {
+  sidebar.setPage("panel.html");
+});

@@ -21,7 +21,9 @@ Capture is restricted to `http://localhost:8080`.
 2. Enable **Developer mode**.
 3. Click **Load unpacked** and select the cloned `share-with-pi` folder.
 4. Close and reopen DevTools on your `http://localhost:8080` page.
-5. Open the **Share with Pi** tab in DevTools; it may be in the `»` overflow menu.
+5. Open **Elements**, then select **Share with Pi** in the sidebar alongside
+   **Styles / Computed**; it may be in that sidebar's `»` overflow menu.
+   The DOM tree and journey interface stay visible together; there is no separate top-level tab.
 
 To update an existing installation, click **Reload** on the extension's card and close
 and reopen DevTools. Save any unsaved journey first. No Pi `/reload` is needed for
@@ -41,10 +43,12 @@ installation/reloading is a manual step. Do not widen the allowlist to automate 
 
 ## Record a journey
 
-1. Open **Share with Pi** once. Recording starts by default and captures the current inspected element.
-2. Switch to **Elements** or use **Inspect** on the page to select each next element.
-   Each newly inspected element becomes a step, even while Share with Pi is hidden.
-3. Return to **Share with Pi** to review the list. Select a step to view its snapshot
+1. In **Elements**, open the **Share with Pi** sidebar. Recording starts by default
+   when its interface loads and captures the current inspected element.
+2. Select each next element in the DOM tree or use **Inspect** on the page.
+   The sidebar stays beside the tree, and each new selection becomes a step.
+   Recording also continues if you switch to another sidebar or DevTools tab.
+3. Review the journey directly in the sidebar. Select a step to view its snapshot
    or add an optional note, such as “Open avatar menu.” Notes belong to individual steps.
 4. Optionally add an overall question. Click **Save journey** once and wait for **Saved**.
 5. Tell Pi: **Read my latest share in ~/Downloads/share-with-pi/**.
@@ -58,7 +62,7 @@ If the initial selection is the page body rather than a target element, remove t
 
 - **Recording / Paused** and the step count show the current state. Recording continues
   while you switch to other DevTools tabs or navigate; it ends when DevTools is closed.
-  Nothing is collected before the panel is first opened in that DevTools instance.
+  Collection begins when the sidebar interface loads in that DevTools instance.
 - **Pause recording** stops new capture and cancels pending captures, retaining existing
   steps and notes. **Resume recording** captures the current inspected element and listens again.
 - Consecutive inspections of the same URL/selector/scope update one step and preserve its
@@ -119,7 +123,7 @@ On 2026-11-07, version 0.1.0 was manually installed by the user and real downloa
 single-element files were read by Pi, including a three-file Open → Absences →
 Substitutes sequence. The missing-avatar report exposed the need for automatic collection.
 
-Version 0.2.0 passes 15 local tests using jsdom and mocked Chrome APIs. These cover
+The current source passes 16 local tests using jsdom and mocked Chrome APIs. These cover
 capture/redaction/origin restrictions, icons, ordered journey export, per-step notes,
 collection while the panel is hidden, duplicate/revisited elements, pause/resume,
 remove/clear, delayed callbacks, and download failures. `npm audit` reported zero
@@ -132,9 +136,13 @@ and the pause/clear/remove controls still need live checks. Navigation also prod
 transient `html`/`body` selections and restored previous selectors; these are not proof
 of explicit user actions and can add noise. Filtering such resets is not implemented.
 
-Manual acceptance after reloading version 0.2.0:
+The switch from a top-level tab to an Elements sidebar is locally tested; live sidebar
+layout and selection behavior still need verification after reloading the extension.
 
-1. Open Share with Pi and confirm **Recording** is visible.
+Manual acceptance after reloading:
+
+1. In Elements, choose the Share with Pi sidebar beside Styles / Computed. Confirm
+   the DOM tree and journey are visible together and **Recording** is shown.
 2. Inspect avatar, then Absences, then Substitutes without saving between selections.
 3. Confirm all three steps appear in order; remove any unwanted initial body selection.
 4. Select each step and add a different note. Switch steps and confirm notes persist.
