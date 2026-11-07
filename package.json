@@ -1,0 +1,13 @@
+{
+  "name": "share-with-pi",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check capture.js && node --check export.js && node --check panel.js && node --check devtools.js && npm test"
+  },
+  "devDependencies": {
+    "jsdom": "27.2.0"
+  }
+}

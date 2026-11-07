@@ -1,0 +1,27 @@
+:root {
+  color-scheme: light dark;
+  font: 13px/1.5 system-ui, sans-serif;
+}
+body { margin: 0; }
+main { max-width: 960px; padding: 16px; }
+h1 { margin: 0; font-size: 20px; }
+.notice { border-left: 3px solid #bd8500; padding-left: 10px; }
+label { display: block; margin: 16px 0 6px; font-weight: 600; }
+pre, textarea, select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #888;
+  border-radius: 4px;
+  background: Canvas;
+  color: CanvasText;
+}
+pre { max-height: 380px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+textarea { resize: vertical; font: inherit; }
+button { padding: 7px 12px; cursor: pointer; }
+button:disabled { cursor: default; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; }
+#recording-state { font-weight: 700; }
+#steps { min-height: 130px; margin-bottom: 8px; }
+#save { margin-top: 10px; }
+#status[data-error="true"] { color: light-dark(#a11, #ff9999); }
