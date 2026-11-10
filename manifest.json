@@ -1,6 +1,12 @@
 {
   "manifest_version": 3,
   "name": "Share with Pi",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "share-with-pi@local",
+      "strict_min_version": "128.0"
+    }
+  },
   "version": "0.2.0",
   "description": "Collect inspected elements from configured origins into a journey and share it with Pi as a local JSON file.",
   "devtools_page": "devtools.html",

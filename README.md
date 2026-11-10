@@ -29,6 +29,26 @@ To update an existing installation, click **Reload** on the extension's card and
 and reopen DevTools. Save any unsaved journey first. No Pi `/reload` is needed for
 extension source changes.
 
+## Install in Firefox (temporary)
+
+Firefox supports the same DevTools sidebar implementation. The whole repository folder
+can be loaded as an unpacked add-on:
+
+1. Open `about:debugging#/runtime/this-firefox` in Firefox.
+2. Click **Load Temporary Add-on…**.
+3. Select this repository's `manifest.json` (not the folder).
+4. Close and reopen DevTools on your configured localhost page. In **Inspector**, open
+   the **Share with Pi** sidebar, beside the Rules/Computed sidebar tabs or in their
+   overflow menu.
+
+Firefox removes temporary add-ons when it closes. Load the `manifest.json` again after
+restarting Firefox. For a persistent install, the add-on must be signed by Mozilla; a
+local unpacked directory cannot be installed permanently through Firefox's normal UI.
+
+Save uses Firefox's Downloads API and the browser's configured download directory. The
+extension requests no host permissions and only captures the exact origins listed in
+`config.js`.
+
 ### Using Chrome DevTools MCP
 
 If your development Chrome is launched with `--disable-extensions`, the extension
